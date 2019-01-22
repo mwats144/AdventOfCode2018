@@ -1,10 +1,11 @@
 package common;
 
 import tasks.Day2;
+import tasks.Day4;
 
 public class Main
 {
-    static Class target = Day2.class;
+    static Class target = Day4.class;
 
     public static void main(String[] args)
     {
