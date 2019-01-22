@@ -1,10 +1,8 @@
 package tasks;
 
 import common.Utils;
-import sun.rmi.runtime.Log;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -77,6 +75,11 @@ public class Day4
         {
             return id;
         }
+
+        public HashMap<Integer,Integer> getSleepMap()
+        {
+            return minuteToSleepMap;
+        }
     }
 
     // Returns the guard ID from a log message
@@ -95,7 +98,7 @@ public class Day4
         return id;
     }
 
-    public Day4() throws ParseException, InterruptedException
+    public Day4() throws Exception
     {
         input = Utils.readFile("res/day4.txt");
 
@@ -144,6 +147,8 @@ public class Day4
             }
         }
 
+        HashMap<Guard, Integer> mostSleptMinuteMap = new HashMap<>();
+
         // Work out our sleepiest guard
         Guard sleepiestGuard = null;
         for (Map.Entry<Integer, Guard> map : guardMap.entrySet())
@@ -163,5 +168,48 @@ public class Day4
 
         // And print the result
         System.out.println("Result: " + sleepiestGuard.id * sleepiestGuard.getMostSleptMinute());
+
+        /**
+         * PART 2
+         */
+
+        // A map of each minute, containing a list of guards and how many times they slept on that minute
+        HashMap<Integer, HashMap<Guard, Integer>> sleepMap = new HashMap<>();
+
+        for (int i=0; i<59; i++)
+        {
+            sleepMap.put(i, new HashMap<>());
+
+            // Find the guard who slept most on this minute, and the number of times they slept
+            for (Map.Entry<Integer, Guard> map : guardMap.entrySet())
+            {
+                HashMap currMap = sleepMap.get(i);
+                currMap.put(map.getValue(), map.getValue().getSleepMap().get(i) == null ? 0 : map.getValue().getSleepMap().get(i));
+            }
+        }
+
+        // For each minute, let's work out the guard that slept most on that minute, and how much they slept
+        for (Map.Entry<Integer, HashMap<Guard, Integer>> map : sleepMap.entrySet())
+        {
+            int minute = map.getKey();
+            HashMap<Guard,Integer> guardMap = map.getValue();
+
+            int biggestSleep = 0;
+            int guardId = -1;
+
+            for (Map.Entry<Guard, Integer> map2 : guardMap.entrySet())
+            {
+                if (map2.getValue() != null && map2.getValue() > biggestSleep) {
+                    guardId = map2.getKey().getId();
+                    biggestSleep = map2.getValue();
+                }
+            }
+
+            // And print out the result
+            System.out.println("Minute: " + minute + " -> " + guardId + " " + biggestSleep);
+
+            // Eyeballing the result, bit cheaty... (748 * 33)
+        }
+
     }
 }
